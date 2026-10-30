@@ -1,6 +1,8 @@
 # Get-DirectoryFileHashes
 
-Calculates selected hashes for files in a directory and displays them in a readable table.
+Configurable script to calculate hash values for files in a directory and to display them in a readable table. 
+
+It is useful for directories containing multiple downloaded installer files or ISO images, allowing values in the generated table to be compared to hash values published online.
 
 ## Description
 
