@@ -4,6 +4,7 @@ Calculates selected hashes for files in a directory and displays them in a reada
 
 .DESCRIPTION
 FileNameRegex is matched against each file's name (not its full path) and is case-insensitive.
+FileName displays each file's path relative to the target directory, excluding the target directory itself.
 Files are displayed in alphabetical order. By default, only files directly in the target directory are included.
 
 .PARAMETER Path
@@ -45,6 +46,12 @@ if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
     throw "Directory not found: $Path"
 }
 
+$rootPath = [System.IO.Path]::GetFullPath((Resolve-Path -LiteralPath $Path).Path)
+$rootPrefix = $rootPath.TrimEnd(
+    [System.IO.Path]::DirectorySeparatorChar,
+    [System.IO.Path]::AltDirectorySeparatorChar
+) + [System.IO.Path]::DirectorySeparatorChar
+
 try {
     $namePattern = [regex]::new(
         $FileNameRegex,
@@ -68,9 +75,10 @@ if ($files.Count -eq 0) {
 $results = foreach ($file in $files) {
     foreach ($algorithm in $Algorithms) {
         $hash = Get-FileHash -LiteralPath $file.FullName -Algorithm $algorithm -ErrorAction Stop
+        $relativePath = $file.FullName.Substring($rootPrefix.Length)
 
         [pscustomobject]@{
-            FileName  = $file.Name
+            FileName  = $relativePath
             Algorithm = $hash.Algorithm
             Hash      = $hash.Hash
         }
