@@ -6,7 +6,7 @@ It is useful for directories containing multiple downloaded installer files or I
 
 ## Description
 
-`FileNameRegex` is matched against each file's name (not its full path) and is case-insensitive. The `FileName` column shows the file's path relative to the directory specified by `-Path`, omitting that directory itself. Thus, with `-Recurse`, subdirectory names remain visible. Files are displayed in alphabetical order. By default, only files directly in the target directory are included.
+`FileNameRegex` is matched against each file's name (not its full path) and is case-insensitive. The `FileName` column shows the file's path relative to the directory specified by `-Path`, omitting that directory itself. With `-Recurse`, files in subdirectories are grouped by their relative directory path in alphabetical order and appear before files directly in the target directory, similar to Windows Explorer's folders-first ordering. By default, only files directly in the target directory are included.
 
 ## Parameters
 

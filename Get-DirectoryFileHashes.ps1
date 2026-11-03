@@ -5,7 +5,8 @@ Calculates selected hashes for files in a directory and displays them in a reada
 .DESCRIPTION
 FileNameRegex is matched against each file's name (not its full path) and is case-insensitive.
 FileName displays each file's path relative to the target directory, excluding the target directory itself.
-Files are displayed in alphabetical order. By default, only files directly in the target directory are included.
+Files in subdirectories are grouped alphabetically by relative directory path and displayed before files directly 
+in the target directory. By default, only files directly in the target directory are included.
 
 .PARAMETER Path
 Directory containing the files to hash. Defaults to the current directory.
@@ -76,15 +77,19 @@ $results = foreach ($file in $files) {
     foreach ($algorithm in $Algorithms) {
         $hash = Get-FileHash -LiteralPath $file.FullName -Algorithm $algorithm -ErrorAction Stop
         $relativePath = $file.FullName.Substring($rootPrefix.Length)
+        $relativeDirectory = Split-Path -Path $relativePath -Parent
+        $isInSubdirectory = -not [string]::IsNullOrEmpty($relativeDirectory)
 
         [pscustomobject]@{
-            FileName  = $relativePath
-            Algorithm = $hash.Algorithm
-            Hash      = $hash.Hash
+            SortGroup       = if ($isInSubdirectory) { 0 } else { 1 }
+            RelativeDir     = $relativeDirectory
+            FileName        = $relativePath
+            Algorithm       = $hash.Algorithm
+            Hash            = $hash.Hash
         }
     }
 }
 
 $results |
-    Sort-Object -Property FileName, Algorithm |
+    Sort-Object -Property SortGroup, RelativeDir, FileName, Algorithm |
     Format-Table -Property FileName, Algorithm, Hash -AutoSize -Wrap
